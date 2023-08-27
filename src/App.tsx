@@ -1,27 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 
 import CardList from "./components/card-list/card-list.component";
 import SearchBox from "./components/Search-box/searchBox.component";
 
 import "./App.css";
+import { getData } from "./utils/data.utils";
+
+//NOTE: this is called a genericwe can can pass it to a function to specify the data returned from it
+export type Monster = {
+  name: string;
+  id: string;
+  email: string;
+};
 
 const App = () => {
-  let [monsters, setMonsters] = useState([]);
+  let [monsters, setMonsters] = useState<Monster[]>([]);
   let [searchFeild, setSearchFeild] = useState("");
   const [filteredMonsters, setFilteredMonsters] = useState(monsters);
   const gettingUsers = async () => {
     try {
-      const data = await fetch("https://jsonplaceholder.typicode.com/users");
-      const users = await data.json();
+      const users = await getData<Monster[]>(
+        "https://jsonplaceholder.typicode.com/users"
+      );
       setMonsters(users);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err.message);
     }
   };
 
   useEffect(() => {
     gettingUsers();
-    console.log("first effect")
+    console.log("first effect");
   }, []);
 
   useEffect(() => {
@@ -33,7 +42,7 @@ const App = () => {
     });
   }, [searchFeild, monsters]);
 
-  const onChangeHandler = (e) => {
+  const onChangeHandler = (e: ChangeEvent<HTMLInputElement>): void => {
     setSearchFeild((preState) => e.target.value.toLocaleLowerCase());
   };
 
